@@ -118,11 +118,13 @@ namespace RebootGuard
             ClientSize = new Size(340, confirmField ? 170 : 130);
 
             var lbl = new Label { Text = prompt, AutoSize = false, Bounds = new Rectangle(12, 12, 316, 20) };
-            _p1.UseSystemPasswordChar = true;
+            _p1.PasswordChar = '●';
+            _p1.TabIndex = 0;
             _p1.Bounds = new Rectangle(12, 36, 316, 24);
 
             var lbl2 = new Label { Text = "Confirm password:", AutoSize = false, Bounds = new Rectangle(12, 68, 316, 20) };
-            _p2.UseSystemPasswordChar = true;
+            _p2.PasswordChar = '●';
+            _p2.TabIndex = 1;
             _p2.Bounds = new Rectangle(12, 92, 316, 24);
 
             int btnY = confirmField ? 128 : 84;
@@ -136,7 +138,17 @@ namespace RebootGuard
             Controls.Add(cancel);
             AcceptButton = ok;
             CancelButton = cancel;
-            Load += (s, e) => { Activate(); _p1.Focus(); };
+            ActiveControl = _p1;
+            // Focus must happen after the window is actually shown, otherwise
+            // keystrokes are dropped (Load fires before the window is visible).
+            Shown += delegate
+            {
+                TopMost = true;
+                BringToFront();
+                Activate();
+                _p1.Focus();
+                _p1.Select();
+            };
         }
     }
 
